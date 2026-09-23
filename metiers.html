@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tous les métiers et services - ArtizPro.tn</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        .categorie-wrapper {
+            margin-bottom: 50px;
+        }
+        .categorie-titre {
+            font-size: 1.35rem;
+            color: #1e293b;
+            border-left: 4px solid var(--primary, #2563eb);
+            padding-left: 12px;
+            margin-bottom: 20px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .categorie-titre span {
+            font-size: 0.85rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+        .metiers-grid-catalogue {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 20px;
+        }
+        .metier-card-pro {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+        }
+        .metier-card-pro:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+            border-color: var(--primary, #2563eb);
+        }
+        .metier-card-img-wrapper {
+            height: 130px;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+            background: #f1f5f9;
+        }
+        .metier-card-img-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+        .metier-card-pro:hover .metier-card-img-wrapper img {
+            transform: scale(1.06);
+        }
+        .metier-badge-icone {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--primary, #2563eb);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            font-size: 0.95rem;
+        }
+        .metier-card-body {
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            justify-content: center;
+        }
+        .metier-card-body h3 {
+            margin: 0 0 4px 0;
+            font-size: 1rem;
+            color: #1e293b;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+        .metier-card-body .nom-ar {
+            font-size: 0.9rem;
+            color: #64748b;
+            font-weight: 500;
+            direction: rtl;
+        }
+
+        .prestataire-card {
+            background: #fff;
+            border: 1px solid #cbd5e1;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .prestataire-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.06);
+        }
+        .prestataire-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        .prestataire-avatar {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #e2e8f0;
+            background-color: #f1f5f9;
+            flex-shrink: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- En-tête / Navigation -->
+    <header class="header">
+        <div class="container nav-container">
+            <div class="logo-wrapper">
+                <a href="index.html" class="logo">
+                    <i class="fa-solid fa-hammer"></i> Artiz<span>Pro</span> <small>.tn</small>
+                </a>
+                <span class="drapeau-tn" title="Tunisie">🇹🇳</span>
+            </div>
+
+            <button class="mobile-menu-btn" id="menuBtn" aria-label="Menu">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+            
+<nav class="nav-menu" id="navMenu">
+    <a href="index.html" class="nav-link active">Accueil</a>
+    <a href="metiers.html" class="nav-link" onclick="sessionStorage.removeItem('dernier_metier_actif');">Tous les métiers</a>                
+    <a href="tarifs.html" class="nav-link">Tarifs</a>
+    <a href="prestataire.html" class="btn-primary-outline">Devenir Prestataire</a>
+    <a href="connexion.html" class="nav-link" style="color: var(--primary); font-weight: 600;"><i class="fa-solid fa-right-to-bracket"></i> Connexion</a>
+</nav>
+        </div>
+    </header>
+
+    <!-- Section Catalogue des Métiers par Catégories -->
+    <section id="sectionMetiersGrille" class="metiers-section container" style="padding-top: 40px; padding-bottom: 50px;">
+        <div class="section-title" style="margin-bottom: 35px;">
+            <h2>Catalogue des spécialités et services en Tunisie</h2>
+            <p>Explorez nos domaines d'activités et trouvez les meilleurs professionnels qualifiés</p>
+        </div>
+
+        <div id="catalogueCategoriesContainer">
+            <div style="text-align: center; padding: 50px; color: var(--text-muted);">
+                <i class="fa-solid fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                <p>Chargement du catalogue des métiers...</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section d'affichage des prestataires -->
+    <section class="container" id="sectionPrestataires" style="display: none; margin-top: 40px; margin-bottom: 50px;">
+        <button onclick="retourAuxMetiers()" style="background: #e2e8f0; border: none; padding: 10px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; color: #1e293b; display: inline-flex; align-items: center; gap: 8px; margin-bottom: 20px; transition: background 0.2s;">
+            <i class="fa-solid fa-arrow-left"></i> Retour aux métiers
+        </button>
+
+        <div style="background: #f8fafc; padding: 30px; border-radius: 12px; border: 1px solid #e2e8f0;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 id="titreMetierSelectionne" style="color: #1e293b; margin: 0; font-size: 1.4rem;">Professionnels</h3>
+            </div>
+            <div id="listePrestatairesGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
+                <!-- Les profils s'afficheront ici dynamiquement -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Pied de page -->
+    <footer>
+        <div class="container footer-content" style="display: flex; flex-direction: column; align-items: center; gap: 20px; text-align: center; padding: 30px 20px;">
+            <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; margin-bottom: 5px;">
+                <a href="https://wa.me/+21625215570" target="_blank" style="background: #25D366; color: white; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 0.95rem; display: inline-flex; align-items: center; gap: 8px;">
+                    <i class="fa-brands fa-whatsapp fa-lg"></i> WhatsApp Direct
+                </a>
+                <a href="mailto:contact@artizpro.tn" style="background: var(--primary, #2563eb); color: white; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 0.95rem; display: inline-flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-envelope"></i> Nous Écrire
+                </a>
+            </div>
+            <p style="margin: 0;">&copy; 2026 <strong>ArtizPro.tn</strong> - Tous droits réservés. Conçu pour connecter les talents en Tunisie 🇹🇳.</p>
+        </div>
+    </footer>
+
+    <script>
+        const SUPABASE_URL = 'https://ucjhxdgrdzfmlvuzoocn.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVjamh4ZGdyZHpmbWx2dXpvb2NuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk2ODAxMTAsImV4cCI6MjEwNTI1NjExMH0.I2TUv1H00mT40q8emMqWHtGifLmMWz0OyXBEYyhw_Cg';
+        
+        window.supabaseClient = window.supabaseClient || window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const db = window.supabaseClient;
+
+        const imageDefautParDefaut = "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=600&q=80";
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const catalogueContainer = document.getElementById('catalogueCategoriesContainer');
+
+            verifierSessionNavbar();
+
+            // 1. Gestion de la recherche intelligente par URL (ex: metiers.html?q=Plombier)[cite: 12]
+            const urlParams = new URLSearchParams(window.location.search);
+            const searchQuery = urlParams.get('q');
+
+            if (searchQuery) {
+                document.getElementById('sectionMetiersGrille').style.display = 'none';
+                const sectionPrestataires = document.getElementById('sectionPrestataires');
+                const titre = document.getElementById('titreMetierSelectionne');
+                
+                sectionPrestataires.style.display = 'block';
+                titre.innerHTML = `<i class="fa-solid fa-magnifying-glass" style="color: var(--primary);"></i> Résultats pour : <span style="color: var(--primary);">${searchQuery}</span>`;
+                
+                await chargerPrestatairesParRechercheIntelligente(searchQuery);
+                return; // On stoppe le chargement de la grille complète si une recherche est active
+            }
+
+            // 2. Gestion du dernier métier actif en mémoire (sessionStorage)
+            const dernierMetier = sessionStorage.getItem('dernier_metier_actif');
+
+            if (dernierMetier) {
+                document.getElementById('sectionMetiersGrille').style.display = 'none';
+                const sectionPrestataires = document.getElementById('sectionPrestataires');
+                const titre = document.getElementById('titreMetierSelectionne');
+                const listeGrid = document.getElementById('listePrestatairesGrid');
+
+                sectionPrestataires.style.display = 'block';
+                titre.innerHTML = `<i class="fa-solid fa-briefcase" style="color: var(--primary);"></i> Professionnels pour : <span style="color: var(--primary);">${dernierMetier}</span>`;
+                
+                listeGrid.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 60px; color: #64748b;">
+                        <i class="fa-solid fa-spinner fa-spin" style="font-size: 2.5rem; color: var(--primary); margin-bottom: 15px;"></i>
+                        <p style="font-size: 1.1rem; font-weight: 500;">Chargement des professionnels...</p>
+                    </div>
+                `;
+            }
+
+            try {
+                const { data: metiers, error } = await db
+                    .from('metiers')
+                    .select('*')
+                    .order('id', { ascending: true });
+
+                if (error) throw error;
+
+                if (metiers && metiers.length > 0) {
+                    const categoriesMap = {};
+                    metiers.forEach(metier => {
+                        const catFr = metier.categorie || 'Autres services';
+                        const catAr = metier.categorie_ar ? ` / ${metier.categorie_ar}` : '';
+                        const cat = catFr + catAr;
+
+                        if (!categoriesMap[cat]) {
+                            categoriesMap[cat] = [];
+                        }
+                        categoriesMap[cat].push(metier);
+                    });
+
+                    catalogueContainer.innerHTML = '';
+
+                    for (const [nomCategorie, listeMetiersCat] of Object.entries(categoriesMap)) {
+                        const wrapperDiv = document.createElement('div');
+                        wrapperDiv.className = 'categorie-wrapper';
+
+                        const titreCat = document.createElement('h3');
+                        titreCat.className = 'categorie-titre';
+                        titreCat.innerHTML = `${nomCategorie} <span>(${listeMetiersCat.length} spécialités)</span>`;
+                        wrapperDiv.appendChild(titreCat);
+
+                        const gridDiv = document.createElement('div');
+                        gridDiv.className = 'metiers-grid-catalogue';
+
+                        listeMetiersCat.forEach(metier => {
+                            const imgUrl = metier.image_url || imageDefautParDefaut;
+                            
+                            const card = document.createElement('div');
+                            card.className = 'metier-card-pro';
+                            card.innerHTML = `
+                                <div class="metier-card-img-wrapper">
+                                    <img src="${imgUrl}" alt="${metier.nom}" loading="lazy">
+                                    <div class="metier-badge-icone">
+                                        <i class="${metier.icone || 'fa-solid fa-briefcase'}"></i>
+                                    </div>
+                                </div>
+                                <div class="metier-card-body">
+                                    <h3>${metier.nom}</h3>
+                                    ${metier.nom_ar ? `<div class="nom-ar">${metier.nom_ar}</div>` : ''}
+                                </div>
+                            `;
+                            card.addEventListener('click', () => chargerPrestatairesDuMetier(metier.nom));
+                            gridDiv.appendChild(card);
+                        });
+
+                        wrapperDiv.appendChild(gridDiv);
+                        catalogueContainer.appendChild(wrapperDiv);
+                    }
+
+                    if (dernierMetier) {
+                        setTimeout(async () => {
+                            await chargerPrestatairesDuMetier(dernierMetier, true);
+                        }, 500);
+                    }
+                } else {
+                    catalogueContainer.innerHTML = '<p style="text-align: center;">Aucun métier trouvé.</p>';
+                }
+            } catch (err) {
+                console.error('Erreur :', err.message);
+                catalogueContainer.innerHTML = '<p style="text-align: center; color: red;">Erreur de chargement du catalogue.</p>';
+            }
+        });
+
+        // Fonction de recherche intelligente connectée aux tables Supabase
+        async function chargerPrestatairesParRechercheIntelligente(query) {
+            const listeGrid = document.getElementById('listePrestatairesGrid');
+            listeGrid.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; padding: 40px;"><i class="fa-solid fa-spinner fa-spin" style="font-size: 1.5rem; color: var(--primary);"></i><br>Recherche des meilleurs profils...</p>';
+
+            try {
+                const { data: gratuits } = await db.from('prestatairesgratuits')
+                    .select('*')
+                    .or(`specialite.ilike.%${query}%,nom_entreprise.ilike.%${query}%`);
+                    
+                const { data: verifies } = await db.from('prestatairesverifie')
+                    .select('*')
+                    .or(`specialite.ilike.%${query}%,nom_entreprise.ilike.%${query}%`);
+
+                const tous = [...(verifies || []), ...(gratuits || [])];
+
+                if (tous.length > 0) {
+                    listeGrid.innerHTML = '';
+                    tous.forEach(p => {
+                        const isPro = p.badge_verifie === true || p.id_paye;
+                        const cartePro = document.createElement('div');
+                        cartePro.className = 'prestataire-card';
+                        
+                        const avatarSection = isPro 
+                            ? `<img src="${p.photo_url || p.avatar || 'profil-pro.jpg'}" alt="Photo ${p.nom_entreprise}" class="prestataire-avatar" onerror="this.src='profil-pro.jpg'">`
+                            : `<div class="prestataire-avatar" style="display: flex; align-items: center; justify-content: center; background: #f1f5f9; color: #94a3b8;"><i class="fa-solid fa-user" style="font-size: 1.2rem;"></i></div>`;
+
+                        const tableSource = (verifies && verifies.includes(p)) ? 'verifie' : 'gratuit';
+
+                        cartePro.innerHTML = `
+                            <div style="cursor: pointer;" onclick="window.location.href='profil-prestataire.html?id=${p.id}&table=${tableSource}'">
+                                <div class="prestataire-header">
+                                    ${avatarSection}
+                                    <div>
+                                        <h4>${p.nom_entreprise} ${isPro ? '<i class="fa-solid fa-circle-check" style="color: #2563EB;" title="Vérifié Pro"></i>' : ''}</h4>
+                                        <span style="font-size: 0.75rem; background: ${isPro ? '#dbeafe' : '#f1f5f9'}; color: ${isPro ? '#1d4ed8' : '#475569'}; padding: 2px 8px; border-radius: 12px; font-weight: 600;">${isPro ? 'Pro Vérifié' : 'Compte Standard'}</span>
+                                    </div>
+                                </div>
+                                <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 8px;"><i class="fa-solid fa-location-dot" style="color: #ef4444;"></i> ${p.ville || 'Tunisie'} - <strong style="color: var(--primary);">${p.specialite || ''}</strong></p>
+                                <p style="font-size: 0.9rem; color: #334155; margin-bottom: 15px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${p.description || 'Aucune description fournie.'}</p>
+                            </div>
+                            <div style="border-top: 1px solid #f1f5f9; padding-top: 12px; display: flex; justify-content: space-between; align-items: center;" onclick="event.stopPropagation()">
+                                <span style="font-size: 0.85rem; font-weight: 600;"><i class="fa-solid fa-phone" style="color: #10b981;"></i> ${p.telephone || 'Non renseigné'}</span>
+                                ${p.telephone ? `<a href="https://wa.me/${p.telephone.replace(/[^0-9]/g, '')}" target="_blank" style="background: #25D366; color: white; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 0.85rem; font-weight: 600;"><i class="fa-brands fa-whatsapp"></i> Contacter</a>` : ''}
+                            </div>
+                        `;
+                        listeGrid.appendChild(cartePro);
+                    });
+                } else {
+                    listeGrid.innerHTML = `
+                        <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #64748b;">
+                            <i class="fa-solid fa-face-frown" style="font-size: 2.5rem; margin-bottom: 10px; color: #cbd5e1;"></i>
+                            <p style="font-size: 1.1rem; margin-bottom: 5px;">Aucun professionnel trouvé pour "<strong>${query}</strong>".</p>
+                            <a href="metiers.html" style="color: var(--primary); font-weight: bold; text-decoration: underline;">Voir tout le catalogue</a>
+                        </div>
+                    `;
+                }
+            } catch (err) {
+                console.error(err);
+                listeGrid.innerHTML = '<p style="color: red; grid-column: 1 / -1; text-align: center;">Erreur lors de la recherche.</p>';
+            }
+        }
+
+        async function chargerPrestatairesDuMetier(nomMetier, skipAnimation = false) {
+            sessionStorage.setItem('dernier_metier_actif', nomMetier);
+
+            const sectionGrille = document.getElementById('sectionMetiersGrille');
+            const sectionPrestataires = document.getElementById('sectionPrestataires');
+            const titre = document.getElementById('titreMetierSelectionne');
+            const listeGrid = document.getElementById('listePrestatairesGrid');
+
+            sectionGrille.style.display = 'none';
+            sectionPrestataires.style.display = 'block';
+
+            titre.innerHTML = `<i class="fa-solid fa-briefcase" style="color: var(--primary);"></i> Professionnels pour : <span style="color: var(--primary);">${nomMetier}</span>`;
+            
+            if (!skipAnimation) {
+                listeGrid.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; padding: 40px;"><i class="fa-solid fa-spinner fa-spin" style="font-size: 1.5rem; color: var(--primary);"></i><br>Chargement des profils...</p>';
+            }
+
+            try {
+                const { data: gratuits } = await db.from('prestatairesgratuits').select('*').eq('specialite', nomMetier);
+                const { data: verifies } = await db.from('prestatairesverifie').select('*').eq('specialite', nomMetier);
+
+                const tous = [...(verifies || []), ...(gratuits || [])];
+
+                if (tous.length > 0) {
+                    listeGrid.innerHTML = '';
+                    tous.forEach(p => {
+                        const isPro = p.badge_verifie === true || p.id_paye;
+                        const cartePro = document.createElement('div');
+                        cartePro.className = 'prestataire-card';
+                        
+                        const avatarSection = isPro 
+                            ? `<img src="${p.photo_url || p.avatar || 'profil-pro.jpg'}" alt="Photo ${p.nom_entreprise}" class="prestataire-avatar" onerror="this.src='profil-pro.jpg'">`
+                            : `<div class="prestataire-avatar" style="display: flex; align-items: center; justify-content: center; background: #f1f5f9; color: #94a3b8;"><i class="fa-solid fa-user" style="font-size: 1.2rem;"></i></div>`;
+
+                        const tableSource = (verifies && verifies.includes(p)) ? 'verifie' : 'gratuit';
+
+                        cartePro.innerHTML = `
+                            <div style="cursor: pointer;" onclick="window.location.href='profil-prestataire.html?id=${p.id}&table=${tableSource}'">
+                                <div class="prestataire-header">
+                                    ${avatarSection}
+                                    <div>
+                                        <h4>${p.nom_entreprise} ${isPro ? '<i class="fa-solid fa-circle-check" style="color: #2563EB;" title="Vérifié Pro"></i>' : ''}</h4>
+                                        <span style="font-size: 0.75rem; background: ${isPro ? '#dbeafe' : '#f1f5f9'}; color: ${isPro ? '#1d4ed8' : '#475569'}; padding: 2px 8px; border-radius: 12px; font-weight: 600;">${isPro ? 'Pro Vérifié' : 'Compte Standard'}</span>
+                                    </div>
+                                </div>
+                                <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 8px;"><i class="fa-solid fa-location-dot" style="color: #ef4444;"></i> ${p.ville || 'Tunisie'}</p>
+                                <p style="font-size: 0.9rem; color: #334155; margin-bottom: 15px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${p.description || 'Aucune description fournie.'}</p>
+                            </div>
+                            <div style="border-top: 1px solid #f1f5f9; padding-top: 12px; display: flex; justify-content: space-between; align-items: center;" onclick="event.stopPropagation()">
+                                <span style="font-size: 0.85rem; font-weight: 600;"><i class="fa-solid fa-phone" style="color: #10b981;"></i> ${p.telephone || 'Non renseigné'}</span>
+                                ${p.telephone ? `<a href="https://wa.me/${p.telephone.replace(/[^0-9]/g, '')}" target="_blank" style="background: #25D366; color: white; padding: 6px 12px; border-radius: 6px; text-decoration: none; font-size: 0.85rem; font-weight: 600;"><i class="fa-brands fa-whatsapp"></i> Contacter</a>` : ''}
+                            </div>
+                        `;
+                        listeGrid.appendChild(cartePro);
+                    });
+                } else {
+                    listeGrid.innerHTML = `
+                        <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #64748b;">
+                            <i class="fa-solid fa-user-slash" style="font-size: 2.5rem; margin-bottom: 10px; color: #cbd5e1;"></i>
+                            <p style="font-size: 1.1rem; margin-bottom: 5px;">Aucun professionnel inscrit pour l'instant dans ce métier.</p>
+                            <a href="prestataire.html" style="color: var(--primary); font-weight: bold; text-decoration: underline;">Soyez le premier à vous inscrire !</a>
+                        </div>
+                    `;
+                }
+            } catch (err) {
+                console.error(err);
+                listeGrid.innerHTML = '<p style="color: red; grid-column: 1 / -1; text-align: center;">Erreur lors du chargement des prestataires.</p>';
+            }
+        }
+
+        function retourAuxMetiers() {
+            sessionStorage.removeItem('dernier_metier_actif');
+            // Nettoyer l'URL si on vient d'une recherche ?q=
+            if (window.location.search) {
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+
+            document.getElementById('sectionPrestataires').style.display = 'none';
+            const sectionGrille = document.getElementById('sectionMetiersGrille');
+            sectionGrille.style.display = 'block';
+
+            const catalogueContainer = document.getElementById('catalogueCategoriesContainer');
+            catalogueContainer.innerHTML = `
+                <div style="text-align: center; padding: 80px; color: #64748b;">
+                    <i class="fa-solid fa-spinner fa-spin" style="font-size: 3rem; color: var(--primary); margin-bottom: 15px;"></i>
+                    <p style="font-size: 1.2rem; font-weight: 500;">Chargement du catalogue...</p>
+                </div>
+            `;
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            setTimeout(() => {
+                location.reload(); 
+            }, 800);
+        }
+
+        function verifierSessionNavbar() {
+            const userDataStr = localStorage.getItem('artizpro_user');
+            const typeCompte = localStorage.getItem('artizpro_type');
+            const lienConnexion = document.querySelector('a[href="connexion.html"]');
+
+            if (userDataStr && lienConnexion) {
+                let user = JSON.parse(userDataStr);
+                lienConnexion.innerHTML = `<i class="fa-solid fa-user-check"></i> ${user.nom_entreprise || 'Mon Espace'}`;
+                
+                if (typeCompte === 'Pro') {
+                    lienConnexion.setAttribute('href', 'clientproconnexion.html');
+                } else {
+                    lienConnexion.setAttribute('href', 'clientconnexion.html');
+                }
+                
+                lienConnexion.style.color = 'var(--primary)';
+                lienConnexion.style.fontWeight = 'bold';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const menuBtn = document.getElementById('menuBtn');
+            const navMenu = document.getElementById('navMenu');
+
+            if (menuBtn && navMenu) {
+                menuBtn.addEventListener('click', () => {
+                    navMenu.classList.toggle('active');
+                    const icon = menuBtn.querySelector('i');
+                    if (navMenu.classList.contains('active')) {
+                        if (icon) {
+                            icon.classList.remove('fa-bars');
+                            icon.classList.add('fa-xmark');
+                        }
+                    } else {
+                        if (icon) {
+                            icon.classList.remove('fa-xmark');
+                            icon.classList.add('fa-bars');
+                        }
+                    }
+                });
+
+                document.querySelectorAll('.nav-menu a').forEach(link => {
+                    link.addEventListener('click', () => {
+                        navMenu.classList.remove('active');
+                        const icon = menuBtn.querySelector('i');
+                        if (icon) {
+                            icon.classList.remove('fa-xmark');
+                            icon.classList.add('fa-bars');
+                        }
+                    });
+                });
+            }
+        });
+    </script>
+
+
+<!-- ========================================== -->
+<!-- SECTION ASSISTANT VIRTUEL IA - ARTIZPRO    -->
+<!-- ========================================== -->
+
+
+
+</body>
+</html>

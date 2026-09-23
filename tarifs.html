@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tarifs & Abonnements - ArtizPro.tn</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Intégration de FontAwesome pour les icônes -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- En-tête / Navigation -->
+    <header class="header">
+        <div class="container nav-container">
+            <div class="logo-wrapper">
+                <a href="index.html" class="logo">
+                    <i class="fa-solid fa-hammer"></i> Artiz<span>Pro</span> <small>.tn</small>
+                </a>
+                <!-- Drapeau de la Tunisie (3alam Touness) -->
+                <span class="drapeau-tn" title="Tunisie">🇹🇳</span>
+            </div>
+            <button class="mobile-menu-btn" id="menuBtn" aria-label="Menu">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+            
+<nav class="nav-menu" id="navMenu">
+    <a href="index.html" class="nav-link active">Accueil</a>
+    <a href="metiers.html" class="nav-link" onclick="sessionStorage.removeItem('dernier_metier_actif');">Tous les métiers</a>                
+    <a href="tarifs.html" class="nav-link">Tarifs</a>
+    <a href="prestataire.html" class="btn-primary-outline">Devenir Prestataire</a>
+    <a href="connexion.html" class="nav-link" style="color: var(--primary); font-weight: 600;"><i class="fa-solid fa-right-to-bracket"></i> Connexion</a>
+</nav>
+        </div>
+    </header>
+
+    <!-- Section Titre Tarifs -->
+    <section class="hero home-hero" style="padding: 40px 0;">
+        <div class="container hero-content">
+            <div class="welcome-badge">
+                <i class="fa-solid fa-tags"></i> <span>Des offres transparentes et adaptées 🇹🇳</span>
+            </div>
+            <h1>Choisissez la formule idéale pour <span class="highlight-text">développer votre activité</span></h1>
+            <p class="hero-subtext">Investissez dans votre visibilité et multipliez vos chantiers et commandes partout en Tunisie.</p>
+        </div>
+    </section>
+
+    <!-- Section Grille des Tarifs -->
+    <section class="container" style="margin: 40px auto; padding-bottom: 60px;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; align-items: stretch;">
+            
+            <!-- Offre Gratuite / Découverte -->
+            <div style="background: var(--white); border: 1px solid var(--border); border-radius: 16px; padding: 30px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow);">
+                <div>
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <h3 style="font-size: 1.3rem; color: var(--dark); margin-bottom: 10px;">Formule Découverte</h3>
+                        <p style="color: #6B7280; font-size: 0.9rem;">Pour tester la plateforme et démarrer</p>
+                        <div style="font-size: 2rem; font-weight: 700; color: var(--primary); margin: 15px 0;">Gratuit</div>
+                    </div>
+                    <ul style="list-style: none; padding: 0; display: flex; flex-direction: column; gap: 12px; margin-bottom: 25px; font-size: 0.95rem; color: var(--dark);">
+                        <li><i class="fa-solid fa-check" style="color: #10B981; margin-right: 8px;"></i> Création de profil basique</li>
+                        <li><i class="fa-solid fa-check" style="color: #10B981; margin-right: 8px;"></i> Apparition dans l'annuaire</li>
+                        <li><i class="fa-solid fa-xmark" style="color: #EF4444; margin-right: 8px;"></i> Badge vérifié</li>
+                        <li><i class="fa-solid fa-xmark" style="color: #EF4444; margin-right: 8px;"></i> Demandes clients en illimité</li>
+                    </ul>
+                </div>
+                <a href="prestataire.html?formule=decouverte" class="btn-primary-outline" style="text-align: center; display: block; padding: 12px; text-decoration: none;">Commencer Gratuitement</a>
+            </div>
+
+            <!-- Offre Pro / Populaire -->
+            <div style="background: var(--white); border: 2px solid var(--primary); border-radius: 16px; padding: 30px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 10px 25px rgba(231, 0, 19, 0.15); position: relative;">
+                <div style="position: absolute; top: -15px; left: 50%; transform: translateX(-50%); background: var(--primary); color: white; padding: 4px 15px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; text-transform: uppercase;">
+                    Le plus populaire 🚀
+                </div>
+                <div>
+                    <div style="text-align: center; margin-bottom: 20px; margin-top: 10px;">
+                        <h3 style="font-size: 1.3rem; color: var(--dark); margin-bottom: 10px;">Pack Pro Tunisie</h3>
+                        <p style="color: #6B7280; font-size: 0.9rem;">Pour les artisans et prestataires ambitieux</p>
+                        <div style="font-size: 2rem; font-weight: 700; color: var(--primary); margin: 15px 0;">29 DT <span style="font-size: 0.9rem; font-weight: normal; color: #6B7280;">/ mois</span></div>
+                    </div>
+                    <ul style="list-style: none; padding: 0; display: flex; flex-direction: column; gap: 12px; margin-bottom: 25px; font-size: 0.95rem; color: var(--dark);">
+                        <li><i class="fa-solid fa-check" style="color: #10B981; margin-right: 8px;"></i> Profil professionnel mis en avant</li>
+                        <li><i class="fa-solid fa-check" style="color: #10B981; margin-right: 8px;"></i> <strong>Badge "Prestataire Vérifié 🇹🇳"</strong></li>
+                        <li><i class="fa-solid fa-check" style="color: #10B981; margin-right: 8px;"></i> Demandes clients en illimité</li>
+                        <li><i class="fa-solid fa-check" style="color: #10B981; margin-right: 8px;"></i> Publication de vos réalisations & photos</li>
+                        <li><i class="fa-solid fa-check" style="color: #10B981; margin-right: 8px;"></i> Support prioritaire WhatsApp</li>
+                    </ul>
+                </div>
+                <a href="prestataire.html?formule=pro" class="btn-submit-pro" style="text-align: center; display: block; text-decoration: none;">Choisir le Pack Pro</a>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Pied de page -->
+ <footer>
+        <div class="container footer-content" style="display: flex; flex-direction: column; align-items: center; gap: 20px; text-align: center; padding: 30px 20px;">
+            
+            <!-- Barrière de contact rapide -->
+            <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; margin-bottom: 5px;">
+                <a href="https://wa.me/+21625215570" target="_blank" style="background: #25D366; color: white; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 0.95rem; display: inline-flex; align-items: center; gap: 8px;">
+                    <i class="fa-brands fa-whatsapp fa-lg"></i> WhatsApp Direct
+                </a>
+                <a href="mailto:contact@artizpro.tn" style="background: var(--primary, #2563eb); color: white; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 0.95rem; display: inline-flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-envelope"></i> Nous Écrire
+                </a>
+            </div>
+
+            <!-- Texte de copyright -->
+            <p style="margin: 0;">&copy; 2026 <strong>ArtizPro.tn</strong> - Tous droits réservés. Conçu pour connecter les talents en Tunisie 🇹🇳.</p>
+            
+        </div>
+    </footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+    const navMenu = document.querySelector('.nav-menu');
+
+    if (mobileMenuBtn && navMenu) {
+        mobileMenuBtn.addEventListener('click', () => {
+            navMenu.classList.toggle('active');
+            
+            // Optionnel : Changer l'icône du bouton (barres <-> croix)
+            const icon = mobileMenuBtn.querySelector('i');
+            if (icon) {
+                icon.classList.toggle('fa-bars');
+                icon.classList.toggle('fa-times');
+            }
+        });
+
+        // Fermer le menu si on clique sur un lien (pratique sur mobile)
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                navMenu.classList.remove('active');
+                const icon = mobileMenuBtn.querySelector('i');
+                if (icon) {
+                    icon.classList.add('fa-bars');
+                    icon.classList.remove('fa-times');
+                }
+            });
+        });
+    }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    const userDataStr = localStorage.getItem('artizpro_user');
+    const typeCompte = localStorage.getItem('artizpro_type');
+    
+    // Sélectionner le lien de connexion dans le menu de navigation
+    // (Par exemple, le lien qui pointe vers 'connexion.html')
+    const lienConnexion = document.querySelector('a[href="connexion.html"], a[href="connexion_5.html"]');
+
+    if (userDataStr && lienConnexion) {
+        let user = JSON.parse(userDataStr);
+        
+        // Personnaliser le bouton de connexion pour qu'il devienne "Mon Espace"
+        lienConnexion.innerHTML = `<i class="fa-solid fa-user-check"></i> ${user.nom_entreprise || 'Mon Espace'}`;
+        
+        // Rediriger vers le bon tableau de bord selon le type de compte (Pro ou Gratuit)
+        if (typeCompte === 'Pro') {
+            lienConnexion.setAttribute('href', 'clientproconnexion.html'); // ou clientproconnexion_2.html selon votre fichier
+        } else {
+            lienConnexion.setAttribute('href', 'clientconnexion.html'); // ou clientconnexion_6.html selon votre fichier
+        }
+        
+        // Optionnel : Ajouter un style distinctif pour montrer qu'il est connecté
+        lienConnexion.style.color = 'var(--primary)';
+        lienConnexion.style.fontWeight = 'bold';
+    }
+});
+    
+</script>
+
+</body>
+</html>

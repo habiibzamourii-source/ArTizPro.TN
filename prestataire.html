@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Devenir Prestataire - ArtizPro.tn</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Intégration de FontAwesome pour les icônes -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Styles spécifiques pour les blocs de tarifs interactifs */
+        .tarifs-choix-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .tarif-option-card {
+            background: #fff;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm, 8px);
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .tarif-option-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .tarif-option-card.active {
+            border-color: var(--primary);
+            background-color: #f0fdf4;
+            position: relative;
+        }
+        .tarif-option-card.active::after {
+            content: "\f058";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            color: #10b981;
+            font-size: 1.2rem;
+        }
+        .tarif-option-card h3 {
+            margin-bottom: 8px;
+            color: var(--dark);
+        }
+        .tarif-option-card .prix {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+        .tarif-option-card p {
+            font-size: 0.9rem;
+            color: #64748b;
+            margin: 0;
+        }
+        @media (max-width: 768px) {
+            .tarifs-choix-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- En-tête / Navigation -->
+    <header class="header">
+        <div class="container nav-container">
+            <div class="logo-wrapper">
+                <a href="index.html" class="logo">
+                    <i class="fa-solid fa-hammer"></i> Artiz<span>Pro</span> <small>.tn</small>
+                </a>
+                <!-- Drapeau de la Tunisie (3alam Touness) -->
+                <span class="drapeau-tn" title="Tunisie">🇹🇳</span>
+            </div>
+
+            <button class="mobile-menu-btn" id="menuBtn" aria-label="Menu">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+            
+<nav class="nav-menu" id="navMenu">
+    <a href="index.html" class="nav-link active">Accueil</a>
+    <a href="metiers.html" class="nav-link" onclick="sessionStorage.removeItem('dernier_metier_actif');">Tous les métiers</a>                
+    <a href="tarifs.html" class="nav-link">Tarifs</a>
+    <a href="prestataire.html" class="btn-primary-outline">Devenir Prestataire</a>
+    <a href="connexion.html" class="nav-link" style="color: var(--primary); font-weight: 600;"><i class="fa-solid fa-right-to-bracket"></i> Connexion</a>
+</nav>
+        </div>
+    </header>
+
+    <!-- Section Formulaire d'inscription -->
+    <section class="container" style="margin-top: 40px; margin-bottom: 40px;">
+        <div class="form-container">
+            <div class="section-title" style="margin-bottom: 25px;">
+                <h2>Inscrivez-vous dès maintenant</h2>
+                <p>Choisissez votre formule et remplissez le formulaire pour créer votre profil</p>
+            </div>
+
+            <!-- Encadré de notification dynamique -->
+            <div id="formAlert" style="display: none; padding: 15px 20px; border-radius: 8px; margin-bottom: 25px; font-weight: 500; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); transition: all 0.3s ease;"></div>
+            
+            <form class="prestataire-form" id="prestataireForm">
+                
+                <!-- Choix des Tarifs en deux cadres -->
+                <div class="tarifs-choix-grid">
+                    <div class="tarif-option-card active" id="cardDecouverte" onclick="selectionnerFormule('decouverte')">
+                        <h3>Formule Découverte</h3>
+                        <div class="prix">Gratuit</div>
+                        <p>Idéal pour tester la visibilité de base sur la plateforme en Tunisie.</p>
+                    </div>
+
+                    <div class="tarif-option-card" id="cardPro" onclick="selectionnerFormule('pro')">
+                        <h3>Pack Pro Tunisie</h3>
+                        <div class="prix">29 DT / mois</div>
+                        <p>Visibilité maximale, badge vérifié et traitement prioritaire des demandes.</p>
+                    </div>
+                </div>
+
+                <!-- Champ Nom et Prénom avec id="nomEntreprise" -->
+                <div class="form-group">
+                    <label><i class="fa-solid fa-user"></i> Nom et Prénom / Nom de l'entreprise</label>
+                    <input type="text" id="nomEntreprise" placeholder="Ex: Atelier Pâtisserie Yasmine ou Ali Plomberie" required>
+                </div>
+
+                <!-- Champ ID Payé -->
+                <div class="form-group" id="idPayeGroup" style="display: none; background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px dashed #cbd5e1;">
+                    <label style="color: #0369a1;"><i class="fa-solid fa-id-card"></i> ID Payé :</label>
+                    <input type="text" id="idPayeInput" placeholder="Entrez votre identifiant de transaction ou reçu de paiement">
+                    <small style="color: #64748b; display: block; margin-top: 5px;">Requis pour valider votre Pack Pro Tunisie.</small>
+                </div>
+                
+                <div class="form-row">
+                    <!-- Spécialité avec id="specialite" -->
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-briefcase"></i> Votre Spécialité / Métier</label>
+                        <select id="specialite" required>
+                            <option value="">Chargement des métiers...</option>
+                        </select>
+                    </div>
+                    <!-- Ville avec id="ville" -->
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-location-dot"></i> Ville / Gouvernorat</label>
+                        <select id="ville" required>
+                            <option value="">Sélectionnez votre ville</option>
+                            <option value="bizerte">Bizerte</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <!-- Téléphone avec id="telephone" -->
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-phone"></i> Numéro de téléphone (WhatsApp)</label>
+                        <input type="tel" id="telephone" placeholder="Ex: +216 XX XXX XXX" required>
+                    </div>
+                    <!-- Email avec id="email" -->
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-envelope"></i> Adresse Email</label>
+                        <input type="email" id="email" placeholder="votre.email@gmail.com">
+                    </div>
+                    <!-- Mot de passe avec bouton afficher/masquer -->
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-lock"></i> Mot de passe</label>
+                        <div style="position: relative;">
+                            <input type="password" id="password" placeholder="Créez un mot de passe sécurisé" required style="width: 100%; padding-right: 40px;">
+                            <button type="button" id="togglePasswordBtn" onclick="togglePasswordVisibility()" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #64748b; font-size: 1rem;">
+                                <i class="fa-solid fa-eye" id="togglePasswordIcon"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Description avec id="description" -->
+                <div class="form-group">
+                    <label><i class="fa-solid fa-pen-to-square"></i> Courte description de vos services</label>
+                    <textarea id="description" rows="4" placeholder="Parlez de votre expérience, de vos réalisations ou de vos spécialités..."></textarea>
+                </div>
+
+                <!-- Bouton avec id="submitBtn" -->
+                <button type="submit" class="btn-submit-pro" id="submitBtn">
+                    <i class="fa-solid fa-check-circle"></i> Soumettre mon inscription
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Section Avantages -->
+    <section class="steps-section container">
+        <div class="section-title">
+            <h2>Pourquoi rejoindre ArtizPro.tn ?</h2>
+            <p>Les avantages pour les artisans, traiteurs, pâtissiers et experts indépendants</p>
+        </div>
+        <div class="steps-grid">
+            <div class="step-card">
+                <i class="fa-solid fa-bullhorn"></i>
+                <h3>Plus de visibilité</h3>
+                <p>Exposez vos réalisations et vos services à des milliers de clients potentiels à la recherche de votre spécialité dans votre région.</p>
+            </div>
+            <div class="step-card">
+                <i class="fa-solid fa-handshake"></i>
+                <h3>Clients qualifiés</h3>
+                <p>Recevez des demandes directes de clients sérieux pour vos chantiers, vos gâteaux, vos événements ou vos services.</p>
+            </div>
+            <div class="step-card">
+                <i class="fa-solid fa-chart-line"></i>
+                <h3>Développez vos revenus</h3>
+                <p>Remplissez votre carnet de commandes toute l'année et gérez votre activité en toute liberté en Tunisie.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section Partenaires Européens -->
+    <section class="container" style="margin: 40px auto; padding-bottom: 40px;">
+        <div class="section-title">
+            <h2>La vision de nos partenaires européens 🇪🇺</h2>
+            <p>Ils soutiennent l'excellence et l'innovation entrepreneuriale en Tunisie</p>
+        </div>
+        <div class="steps-grid">
+            <div class="step-card" style="text-align: left; background: var(--white); display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80" alt="Marc Lelièvre" style="width: 55px; height: 55px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary);">
+                        <div>
+                            <h4 style="margin: 0; font-size: 1.05rem; color: var(--dark); display: flex; align-items: center; gap: 6px;">
+                                Marc Lelièvre <i class="fa-solid fa-circle-check" style="color: #2563EB; font-size: 0.9rem;" title="Partenaire vérifié"></i>
+                            </h4>
+                            <span style="font-size: 0.85rem; color: #6B7280;">Directeur Innovation — Paris, France 🇫🇷</span>
+                        </div>
+                    </div>
+                    <div style="color: #FBBF24; margin-bottom: 10px; font-size: 0.9rem;">
+                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                    </div>
+                    <p style="font-style: italic; color: var(--dark); font-size: 0.95rem; line-height: 1.5;">
+                        "En tant que partenaire européen, je suis convaincu qu'ArtizPro sera la 1ère plateforme en Tunisie pour structurer et valoriser le savoir-faire des artisans et prestataires locaux."
+                    </p>
+                </div>
+            </div>
+
+            <div class="step-card" style="text-align: left; background: var(--white); display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80" alt="Stéphane Van Der Berg" style="width: 55px; height: 55px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary);">
+                        <div>
+                            <h4 style="margin: 0; font-size: 1.05rem; color: var(--dark); display: flex; align-items: center; gap: 6px;">
+                                Stéphane Van Der Berg <i class="fa-solid fa-circle-check" style="color: #2563EB; font-size: 0.9rem;" title="Partenaire vérifié"></i>
+                            </h4>
+                            <span style="font-size: 0.85rem; color: #6B7280;">Consultant Stratégie — Bruxelles, Belgique 🇧🇪</span>
+                        </div>
+                    </div>
+                    <div style="color: #FBBF24; margin-bottom: 10px; font-size: 0.9rem;">
+                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                    </div>
+                    <p style="font-style: italic; color: var(--dark); font-size: 0.95rem; line-height: 1.5;">
+                        "Le niveau d'exigence et la vision de ce projet sont remarquables. Sans aucun doute, cette plateforme sera la 1ère en Tunisie et une référence incontournable en Méditerranée."
+                    </p>
+                </div>
+            </div>
+
+            <div class="step-card" style="text-align: left; background: var(--white); display: flex; flex-direction: column; justify-content: space-between;">
+                <div>
+                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                        <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80" alt="Julian Meyer" style="width: 55px; height: 55px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary);">
+                        <div>
+                            <h4 style="margin: 0; font-size: 1.05rem; color: var(--dark); display: flex; align-items: center; gap: 6px;">
+                                Julian Meyer <i class="fa-solid fa-circle-check" style="color: #2563EB; font-size: 0.9rem;" title="Partenaire vérifié"></i>
+                            </h4>
+                            <span style="font-size: 0.85rem; color: #6B7280;">Investisseur Tech — Genève, Suisse 🇨🇭</span>
+                        </div>
+                    </div>
+                    <div style="color: #FBBF24; margin-bottom: 10px; font-size: 0.9rem;">
+                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                    </div>
+                    <p style="font-style: italic; color: var(--dark); font-size: 0.95rem; line-height: 1.5;">
+                        "Nous sommes fiers de collaborer sur cette initiative. Par sa robustesse et son ambition, cette plateforme sera la 1ère en Tunisie pour connecter les meilleurs talents."
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container footer-content" style="display: flex; flex-direction: column; align-items: center; gap: 20px; text-align: center; padding: 30px 20px;">
+            <!-- Barrière de contact rapide -->
+            <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; margin-bottom: 5px;">
+                <a href="https://wa.me/+21625215570" target="_blank" style="background: #25D366; color: white; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 0.95rem; display: inline-flex; align-items: center; gap: 8px;">
+                    <i class="fa-brands fa-whatsapp fa-lg"></i> WhatsApp Direct
+                </a>
+                <a href="mailto:contact@artizpro.tn" style="background: var(--primary, #2563eb); color: white; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 0.95rem; display: inline-flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-envelope"></i> Nous Écrire
+                </a>
+            </div>
+            <!-- Texte de copyright -->
+            <p style="margin: 0;">&copy; 2026 <strong>ArtizPro.tn</strong> - Tous droits réservés. Conçu pour connecter les talents en Tunisie 🇹🇳.</p>
+        </div>
+    </footer>
+
+    <!-- Intégration du SDK Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- Fichier JavaScript externe -->
+    <script src="prestataire.js" defer></script>
+</body>
+</html>

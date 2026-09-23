@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profil Professionnel - ArtizPro.tn</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        /* --- DESIGN PLEIN ÉCRAN & ADAPATATION MOBILE --- */
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--gray-light, #f8fafc);
+        }
+
+        .profile-container {
+            max-width: 1000px;
+            margin: 30px auto;
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(44, 22, 25, 0.06);
+            position: relative;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+
+        /* Liseré supérieur */
+        .profile-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, var(--primary), var(--accent-gold, #d97706));
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 28px;
+            margin-bottom: 25px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .profile-avatar-wrapper {
+            position: relative;
+        }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid var(--white);
+            background-color: var(--gray-light);
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(128, 0, 32, 0.15);
+            transition: transform 0.3s ease;
+        }
+
+        .profile-avatar:hover {
+            transform: scale(1.05);
+        }
+
+        .profile-info h1 {
+            margin: 0 0 10px 0;
+            color: var(--dark);
+            font-size: 2.1rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        /* --- MENU ONGLETS PAR SECTION --- */
+        .profile-nav-menu {
+            display: flex;
+            gap: 8px;
+            background: var(--gray-light);
+            padding: 8px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            margin-bottom: 30px;
+            overflow-x: auto;
+            white-space: nowrap;
+            scrollbar-width: none;
+        }
+
+        .profile-nav-menu::-webkit-scrollbar {
+            display: none;
+        }
+
+        .profile-nav-link {
+            padding: 12px 20px;
+            border-radius: 12px;
+            color: var(--gray-dark);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.25s ease;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .profile-nav-link:hover {
+            color: var(--primary);
+        }
+
+        .profile-nav-link.active {
+            background: var(--white);
+            color: var(--primary);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+        }
+
+        /* --- GESTION DE L'AFFICHAGE PAR SECTION (MASQUÉ/VISIBLE) --- */
+        .section-box {
+            display: none; /* Masqué par défaut */
+            animation: fadeIn 0.35s ease forwards;
+        }
+
+        .section-box.active-section {
+            display: block; /* Visible uniquement si actif */
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-box h3 {
+            color: var(--dark);
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--primary);
+            padding-left: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .badge-verifie {
+            background: rgba(13, 115, 56, 0.08);
+            color: #0D7338;
+            border: 1px solid rgba(13, 115, 56, 0.2);
+            padding: 6px 16px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Grille des coordonnées */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+        }
+
+        .info-card {
+            background: var(--gray-light);
+            padding: 18px;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+        }
+
+        .info-card span {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--gray);
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 700;
+        }
+
+        .info-card strong {
+            color: var(--dark);
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .description-box {
+            color: var(--gray-dark);
+            line-height: 1.8;
+            background: var(--gray-light);
+            padding: 24px;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            font-size: 1rem;
+        }
+
+        /* Horaires */
+        .hours-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+        }
+
+        .hour-item {
+            background: var(--gray-light);
+            border: 1px solid var(--border);
+            padding: 14px 16px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .hour-day {
+            font-weight: 700;
+            color: var(--dark);
+            font-size: 0.9rem;
+        }
+
+        .hour-time {
+            font-weight: 600;
+            color: var(--gray-dark);
+            font-size: 0.85rem;
+            background: var(--white);
+            padding: 4px 8px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+        }
+
+        .hour-time.urgent {
+            background: rgba(255, 30, 56, 0.08);
+            color: var(--primary);
+            border-color: rgba(255, 30, 56, 0.2);
+        }
+
+        /* Galerie Réalisations */
+        .portfolio-grid-public {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 16px;
+        }
+
+        .portfolio-item-public {
+            border-radius: 14px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            background: var(--white);
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .portfolio-item-public:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            border-color: var(--primary);
+        }
+
+        .portfolio-image-wrapper {
+            position: relative;
+            height: 150px;
+            width: 100%;
+            background: var(--gray-light);
+        }
+
+        .portfolio-image-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .portfolio-item-title {
+            padding: 10px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--dark);
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Actions du bas */
+        .actions-wrapper {
+            margin-top: 35px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+            border-top: 1px solid var(--border);
+            padding-top: 25px;
+        }
+
+        .btn-whatsapp {
+            background: #25D366;
+            color: white;
+            padding: 14px 26px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 6px 18px rgba(37, 211, 102, 0.3);
+            transition: background 0.2s ease;
+        }
+
+        .btn-whatsapp:hover {
+            background: #20ba5a;
+        }
+
+        .btn-back {
+            background: var(--gray-light);
+            color: var(--dark);
+            padding: 14px 22px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid var(--border);
+        }
+
+        /* Modale */
+        .image-modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(44, 22, 25, 0.9);
+            backdrop-filter: blur(8px);
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .image-modal img {
+            max-width: 90%;
+            max-height: 85vh;
+            border-radius: 16px;
+            object-fit: contain;
+        }
+
+        .image-modal-close {
+            position: absolute;
+            top: 25px; right: 25px;
+            color: white;
+            font-size: 1.8rem;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            width: 45px; height: 45px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        /* --- ADAPTATION PLEIN ÉCRAN MOBILE (< 768px) --- */
+        @media (max-width: 768px) {
+            body {
+                background: var(--white);
+            }
+            .profile-container {
+                margin: 0;
+                border-radius: 0;
+                border: none;
+                box-shadow: none;
+                padding: 15px;
+                min-height: 100vh;
+            }
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+            }
+            .profile-info h1 {
+                justify-content: center;
+                font-size: 1.6rem;
+            }
+            .profile-nav-menu {
+                border-radius: 12px;
+                padding: 6px;
+                margin-bottom: 20px;
+            }
+            .profile-nav-link {
+                padding: 10px 14px;
+                font-size: 0.85rem;
+            }
+            .actions-wrapper {
+                flex-direction: column;
+                width: 100%;
+            }
+            .btn-whatsapp, .btn-back {
+                width: 100%;
+                justify-content: center;
+                box-sizing: border-box;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- En-tête / Navigation -->
+    <header class="header">
+        <div class="container nav-container">
+            <div class="logo-wrapper">
+                <a href="index.html" class="logo">
+                    <i class="fa-solid fa-hammer"></i> Artiz<span>Pro</span> <small>.tn</small>
+                </a>
+                <span class="drapeau-tn" title="Tunisie">🇹🇳</span>
+            </div>
+            <nav class="nav-menu">
+                <a href="metiers.html" class="nav-link"><i class="fa-solid fa-arrow-left"></i> Retour</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Contenu du Profil Plein Écran -->
+    <main class="container" style="padding: 0; max-width: 1000px;">
+        <div id="profilContent" class="profile-container">
+            <div style="text-align: center; padding: 60px 20px; color: var(--gray);">
+                <i class="fa-solid fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 15px; color: var(--primary);"></i>
+                <p style="font-size: 1rem; font-weight: 500;">Chargement du profil...</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Visionneuse Modale -->
+    <div id="imageModal" class="image-modal" onclick="fermerModalImage()">
+        <button class="image-modal-close" onclick="fermerModalImage()">&times;</button>
+        <img id="modalImageSrc" src="" alt="Agrandissement">
+    </div>
+
+    <!-- Pied de page -->
+    <footer>
+        <div class="container footer-content">
+            <p>&copy; 2026 <strong>ArtizPro.tn</strong> - Tous droits réservés. 🇹🇳</p>
+        </div>
+    </footer>
+
+    <script>
+        const SUPABASE_URL = 'https://ucjhxdgrdzfmlvuzoocn.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVjamh4ZGdyZHpmbWx2dXpvb2NuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk2ODAxMTAsImV4cCI6MjEwNTI1NjExMH0.I2TUv1H00mT40q8emMqWHtGifLmMWz0OyXBEYyhw_Cg';
+        
+        window.supabaseClient = window.supabaseClient || window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const db = window.supabaseClient;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const prestataireId = urlParams.get('id');
+            const container = document.getElementById('profilContent');
+
+            if (!prestataireId) {
+                container.innerHTML = '<p style="text-align: center; color: red;">Aucun identifiant spécifié.</p>';
+                return;
+            }
+
+            try {
+                const { data: pro, error: errorPro } = await db
+                    .from('prestatairesverifie')
+                    .select('*')
+                    .eq('id', prestataireId)
+                    .single();
+
+                if (errorPro || !pro) {
+                    container.innerHTML = `
+                        <div style="text-align: center; padding: 40px 20px;">
+                            <i class="fa-solid fa-triangle-exclamation" style="font-size: 3rem; color: var(--accent-gold); margin-bottom: 15px;"></i>
+                            <h2 style="color: var(--dark); margin-bottom: 10px;">Profil introuvable</h2>
+                            <a href="metiers.html" class="btn-back"><i class="fa-solid fa-arrow-left"></i> Retour à la liste</a>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const { data: realisations } = await db
+                    .from('realisations')
+                    .select('*')
+                    .eq('prestataire_id', prestataireId);
+
+                const avatarSrc = pro.photo_url || pro.avatar || 'profil-pro.jpg';
+
+                let portfolioHtml = '<p style="color: var(--gray); font-style: italic; background: var(--gray-light); padding: 20px; border-radius: 12px; text-align: center; margin: 0;">Aucune photo de réalisation publiée.</p>';
+                if (realisations && realisations.length > 0) {
+                    portfolioHtml = '<div class="portfolio-grid-public">';
+                    realisations.forEach(item => {
+                        const titre = item.titre || 'Réalisation';
+                        portfolioHtml += `
+                            <div class="portfolio-item-public" onclick="ouvrirModalImage('${item.image_url}')">
+                                <div class="portfolio-image-wrapper">
+                                    <img src="${item.image_url}" alt="${titre}">
+                                </div>
+                                <div class="portfolio-item-title" title="${titre}">${titre}</div>
+                            </div>
+                        `;
+                    });
+                    portfolioHtml += '</div>';
+                }
+
+                let horairesHtml = '<p style="color: var(--gray); font-style: italic;">Horaires non renseignés.</p>';
+                if (pro.horaire) {
+                    try {
+                        const horairesObj = typeof pro.horaire === 'string' ? JSON.parse(pro.horaire) : pro.horaire;
+                        horairesHtml = '<div class="hours-container">';
+                        for (const [jour, heures] of Object.entries(horairesObj)) {
+                            const isUrgent = heures.toLowerCase().includes('urgences') || heures.toLowerCase().includes('24/7');
+                            horairesHtml += `
+                                <div class="hour-item">
+                                    <span class="hour-day"><i class="fa-regular fa-calendar" style="color: var(--primary);"></i> ${jour}</span>
+                                    <span class="hour-time ${isUrgent ? 'urgent' : ''}">${heures}</span>
+                                </div>
+                            `;
+                        }
+                        horairesHtml += '</div>';
+                    } catch (e) {
+                        horairesHtml = `<div class="description-box">${pro.horaire}</div>`;
+                    }
+                }
+
+                container.innerHTML = `
+                    <div class="profile-header">
+                        <div class="profile-avatar-wrapper">
+                            <img src="${avatarSrc}" alt="Photo ${pro.nom_entreprise}" class="profile-avatar" onclick="ouvrirModalImage(this.src)" onerror="this.src='profil-pro.jpg'">
+                        </div>
+                        <div class="profile-info">
+                            <h1>
+                                ${pro.nom_entreprise} 
+                                <i class="fa-solid fa-circle-check" style="color: var(--primary); font-size: 1.3rem;" title="Pro Vérifié"></i>
+                            </h1>
+                            <span class="badge-verifie"><i class="fa-solid fa-shield-halved"></i> Professionnel Vérifié 🇹🇳</span>
+                        </div>
+                    </div>
+
+                    <!-- MENU ONGLET (CHANGEMENT DE SECTION INDÉPENDANT) -->
+                    <nav class="profile-nav-menu">
+                        <button class="profile-nav-link active" onclick="switchSection('coordonnees', this)"><i class="fa-solid fa-address-card"></i> Coordonnées</button>
+                        <button class="profile-nav-link" onclick="switchSection('description', this)"><i class="fa-solid fa-align-left"></i> Description</button>
+                        <button class="profile-nav-link" onclick="switchSection('horaires', this)"><i class="fa-solid fa-clock"></i> Horaires</button>
+                        <button class="profile-nav-link" onclick="switchSection('realisations', this)"><i class="fa-solid fa-images"></i> Réalisations</button>
+                    </nav>
+
+                    <!-- SECTION 1 : COORDONNÉES (ACTIVE PAR DÉFAUT) -->
+                    <div id="coordonnees" class="section-box active-section">
+                        <h3><i class="fa-solid fa-address-card" style="color: var(--primary);"></i> Coordonnées & Localisation</h3>
+                        <div class="info-grid">
+                            <div class="info-card">
+                                <span>Spécialité</span>
+                                <strong>${pro.specialite || 'Non renseigné'}</strong>
+                            </div>
+                            <div class="info-card">
+                                <span>Gouvernorat</span>
+                                <strong><i class="fa-solid fa-location-dot" style="color: var(--primary);"></i> ${pro.ville || 'Tunisie'}</strong>
+                            </div>
+                            <div class="info-card">
+                                <span>Téléphone</span>
+                                <strong><i class="fa-solid fa-phone" style="color: var(--accent-gold);"></i> ${pro.telephone || 'Non renseigné'}</strong>
+                            </div>
+                            <div class="info-card">
+                                <span>Email</span>
+                                <strong style="word-break: break-all; font-size: 0.9rem;"><i class="fa-solid fa-envelope" style="color: var(--primary);"></i> ${pro.email || 'Non renseigné'}</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SECTION 2 : DESCRIPTION -->
+                    <div id="description" class="section-box">
+                        <h3><i class="fa-solid fa-align-left" style="color: var(--primary);"></i> Description des services</h3>
+                        <div class="description-box">${pro.description || 'Aucune description détaillée fournie.'}</div>
+                    </div>
+
+                    <!-- SECTION 3 : HORAIRES -->
+                    <div id="horaires" class="section-box">
+                        <h3><i class="fa-solid fa-clock" style="color: var(--primary);"></i> Horaires d'ouverture</h3>
+                        ${horairesHtml}
+                    </div>
+
+                    <!-- SECTION 4 : RÉALISATIONS (SEULE CETTE SECTION S'AFFICHE QUand on clique) -->
+                    <div id="realisations" class="section-box">
+                        <h3><i class="fa-solid fa-images" style="color: var(--primary);"></i> Galerie des Réalisations</h3>
+                        <p style="font-size: 0.85rem; color: var(--gray); margin-bottom: 14px;">Cliquez sur une photo pour l'agrandir.</p>
+                        ${portfolioHtml}
+                    </div>
+
+                    <div class="actions-wrapper">
+                        ${pro.telephone ? `<a href="https://wa.me/${pro.telephone.replace(/[^0-9]/g, '')}" target="_blank" class="btn-whatsapp"><i class="fa-brands fa-whatsapp fa-xl"></i> Discuter sur WhatsApp</a>` : ''}
+                        <a href="metiers.html" class="btn-back"><i class="fa-solid fa-arrow-left"></i> Retour</a>
+                    </div>
+                `;
+
+            } catch (err) {
+                console.error(err);
+                container.innerHTML = '<p style="text-align: center; color: red;">Erreur lors du chargement.</p>';
+            }
+        });
+
+        // --- FONCTION DE BASCULEMENT STRICT DES ONGLETS ---
+        function switchSection(sectionId, element) {
+            // Masquer toutes les sections
+            document.querySelectorAll('.section-box').forEach(sec => {
+                sec.classList.remove('active-section');
+            });
+
+            // Afficher uniquement la section ciblée
+            const target = document.getElementById(sectionId);
+            if (target) {
+                target.classList.add('active-section');
+            }
+
+            // Gérer l'état actif des boutons du menu
+            document.querySelectorAll('.profile-nav-link').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            element.classList.add('active');
+        }
+
+        function ouvrirModalImage(url) {
+            const modal = document.getElementById('imageModal');
+            document.getElementById('modalImageSrc').src = url;
+            modal.style.display = 'flex';
+        }
+
+        function fermerModalImage() {
+            document.getElementById('imageModal').style.display = 'none';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ArtizPro.tn - La 1ère plateforme des services et de l'artisanat en Tunisie</title>
+    
+    <!-- Script instantané pour éviter le délai d'affichage -->
+    <script>
+        (function() {
+            const userDataStr = localStorage.getItem('artizpro_user');
+            const typeCompte = localStorage.getItem('artizpro_type');
+            if (userDataStr) {
+                try {
+                    window.__preloadedUser = JSON.parse(userDataStr);
+                    window.__preloadedType = typeCompte;
+                } catch(e) {}
+            }
+
+            const cachedTalents = localStorage.getItem('artizpro_talents_vedette');
+            if (cachedTalents) {
+                try {
+                    window.__preloadedTalents = JSON.parse(cachedTalents);
+                } catch(e) {}
+            }
+        })();
+    </script>
+
+    <!-- Fichier CSS principal & FontAwesome -->
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- En-tête / Navigation -->
+    <header class="header">
+        <div class="container nav-container">
+            <div class="logo-wrapper">
+                <a href="index.html" class="logo">
+                    <i class="fa-solid fa-hammer"></i> Artiz<span>Pro</span> <small>.tn</small>
+                </a>
+                <span class="drapeau-tn" title="Tunisie">🇹🇳</span>
+            </div>
+
+            <button class="mobile-menu-btn" id="menuBtn" aria-label="Menu">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+            
+          <nav class="nav-menu" id="navMenu">
+    <a href="index.html" class="nav-link active">Accueil</a>
+    <a href="metiers.html" class="nav-link" onclick="sessionStorage.removeItem('dernier_metier_actif');">Tous les métiers</a>                
+    <a href="tarifs.html" class="nav-link">Tarifs</a>
+    <a href="prestataire.html" class="btn-primary-outline">Devenir Prestataire</a>
+    <a href="connexion.html" class="nav-link" style="color: var(--primary); font-weight: 600;"><i class="fa-solid fa-right-to-bracket"></i> Connexion</a>
+</nav>
+        </div>
+    </header>
+
+    <!-- Section Hero (Accueil & Recherche) -->
+    <section class="hero home-hero">
+        <div class="container hero-content">
+            
+            <div class="welcome-badge">
+                <i class="fa-solid fa-crown"></i> <span>La référence n°1 des services et talents en Tunisie 🇹🇳</span> <i class="fa-solid fa-star"></i>
+            </div>
+
+            <h1>
+                Trouvez les <span class="highlight-text">meilleurs professionnels</span> de confiance en un clic
+            </h1>
+
+            <p class="hero-tags">
+                <span><i class="fa-solid fa-check-circle text-primary"></i> Artisans & Bâtiment</span> &bull; 
+                <span><i class="fa-solid fa-utensils text-primary"></i> Traiteurs & Pâtisseries</span> &bull; 
+                <span><i class="fa-solid fa-laptop-code text-primary"></i> Experts Numériques</span>
+            </p>
+            <p class="hero-subtext">
+                De Tunis à Sousse, en passant par Sfax, Bizerte et toutes les régions : accédez instantanément à un réseau qualifié pour vos chantiers, vos événements et vos besoins du quotidien.
+            </p>
+            
+            <!-- Barre de recherche -->
+            <div class="search-bar">
+                <div class="search-input-group">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="searchInput" placeholder="Que recherchez-vous ? (ex: Plombier, Traiteur, Développeur...)">
+                    <div id="suggestionsBox" style="display: none; position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid var(--border); border-radius: var(--radius-sm); box-shadow: var(--shadow-md); z-index: 100; max-height: 250px; overflow-y: auto; text-align: left; margin-top: 5px;"></div>
+                </div>
+                <button class="btn-search" onclick="lancerRecherche()">
+                    <i class="fa-solid fa-search"></i> <span>Rechercher</span>
+                </button>
+            </div>
+
+            <div class="quick-links-cta" style="margin-top: 20px;">
+                <p>Besoin d'inspiration ? <a href="metiers.html">Explorer l'ensemble de nos spécialités <i class="fa-solid fa-arrow-right"></i></a></p>
+            </div>
+        </div>
+    </section>
+
+<!-- Section des Prestataires Vérifiés (Cadres publicitaires lumineux avec défilement) -->
+    <section class="verified-pros-section container" style="padding: 50px 20px;">
+        <div class="section-title" style="text-align: center; margin-bottom: 30px;">
+            <h2>Nos Talents Vérifiés en Vedette</h2>
+            <p>Des professionnels rigoureusement sélectionnés pour la qualité de leur travail</p>
+        </div>
+        
+        <div class="featured-slider-wrapper">
+            <!-- Bouton Défilement Gauche -->
+            <button class="slider-btn prev-btn" onclick="defilerTalents('gauche')" aria-label="Précédent">
+                <i class="fa-solid fa-chevron-left"></i>
+            </button>
+
+            <!-- Grille / Carrousel des talents -->
+            <div id="verifiedProsGrid" class="featured-slider-container">
+                <script>
+                    let talentsAffiche = [];
+                    if (window.__preloadedTalents && window.__preloadedTalents.length > 0) {
+                        talentsAffiche = window.__preloadedTalents;
+                    } else {
+                        talentsAffiche = [
+                            { nom_entreprise: "Artisan Bâtiment Pro", specialite: "Maçonnerie & Rénovation", ville: "Tunis" },
+                            { nom_entreprise: "Saveurs du Cap Bon", specialite: "Traiteur & Pâtisserie", ville: "Nabeul" },
+                            { nom_entreprise: "Plomberie Express", specialite: "Installation & Dépannage", ville: "Bizerte" },
+                            { nom_entreprise: "Digital Dev Solutions", specialite: "Développement Web & Mobile", ville: "Sousse" }
+                        ];
+                    }
+
+                    document.write(talentsAffiche.map(p => {
+                        const photoUrl = p.photo_url || p['photo-url'];
+                        const avatarHtml = photoUrl 
+                            ? `<img src="${photoUrl}" alt="${p.nom_entreprise}" style="width: 55px; height: 55px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); flex-shrink: 0;">`
+                            : `<div style="width: 55px; height: 55px; border-radius: 50%; background: var(--primary-light); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; border: 1px solid rgba(255, 30, 56, 0.2);"><i class="fa-solid fa-user"></i></div>`;
+                        return `
+                        <div class="talent-promo-card">
+                            ${avatarHtml}
+                            <div style="flex-grow: 1; overflow: hidden;">
+                                <div style="display: flex; align-items: center; justify-content: space-between;">
+                                    <h3 style="font-size: 1rem; color: var(--dark); margin: 0 0 3px 0; display: flex; align-items: center; gap: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 700;">
+                                        ${p.nom_entreprise || 'Prestataire'} <i class="fa-solid fa-circle-check" style="color: var(--primary); font-size: 0.85rem;" title="Vérifié Pro"></i>
+                                    </h3>
+                                    <span style="background: var(--primary); color: white; font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; font-weight: 700; text-transform: uppercase;">Vedette</span>
+                                </div>
+                                <p style="color: var(--primary); font-weight: 600; font-size: 0.85rem; margin: 0 0 4px 0;">${p.specialite || 'Spécialité'}</p>
+                                <p style="color: var(--gray); font-size: 0.78rem; margin: 0; display: flex; align-items: center; gap: 3px;"><i class="fa-solid fa-location-dot" style="font-size: 0.7rem; color: var(--primary-dark);"></i> ${p.ville || 'Tunisie'}</p>
+                            </div>
+                        </div>`;
+                    }).join(''));
+                </script>
+            </div>
+
+            <!-- Bouton Défilement Droite -->
+            <button class="slider-btn next-btn" onclick="defilerTalents('droite')" aria-label="Suivant">
+                <i class="fa-solid fa-chevron-right"></i>
+            </button>
+        </div>
+    </section>
+
+    <!-- Section Comment ça marche -->
+    <section id="comment-ca-marche" class="steps-section container" style="padding: 40px 20px 60px 20px;">
+        <div class="section-title">
+            <h2>Comment fonctionne ArtizPro.tn ?</h2>
+            <p>Une mise en relation simple, rapide et sécurisée à travers toute la Tunisie</p>
+        </div>
+        <div class="steps-grid">
+            <div class="step-card">
+                <div class="step-number">1</div>
+                <i class="fa-solid fa-magnifying-glass-location"></i>
+                <h3>Recherchez</h3>
+                <p>Trouvez le profil idéal correspondant exactement à vos critères et à votre localisation.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-number">2</div>
+                <i class="fa-solid fa-address-book"></i>
+                <h3>Comparez & Contactez</h3>
+                <p>Consultez les avis, les réalisations et échangez directement par téléphone ou WhatsApp.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-number">3</div>
+                <i class="fa-solid fa-circle-check"></i>
+                <h3>Concrétisez</h3>
+                <p>Réalisez vos projets l'esprit tranquille grâce à des prestataires de confiance engagés.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pied de page -->
+    <footer>
+        <div class="container footer-content" style="display: flex; flex-direction: column; align-items: center; gap: 20px; text-align: center; padding: 30px 20px;">
+            <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; margin-bottom: 5px;">
+                <a href="https://wa.me/+21625215570" target="_blank" style="background: #25D366; color: white; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 0.95rem; display: inline-flex; align-items: center; gap: 8px;">
+                    <i class="fa-brands fa-whatsapp fa-lg"></i> WhatsApp Direct
+                </a>
+                <a href="mailto:contact@artizpro.tn" style="background: var(--primary, #FF1E38); color: white; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 0.95rem; display: inline-flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-envelope"></i> Nous Écrire
+                </a>
+            </div>
+            <p style="margin: 0; color: #A0AEC0; font-size: 0.9rem;">&copy; 2026 <strong>ArtizPro.tn</strong> - Tous droits réservés. Fièrement conçu pour connecter les talents en Tunisie 🇹🇳.</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="index.js"></script>
+    
+
+</body>
+</html>

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion Prestataire - ArtizPro.tn</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Intégration de FontAwesome pour les icônes -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- En-tête / Navigation -->
+    <header class="header">
+        <div class="container nav-container">
+            <div class="logo-wrapper">
+                <a href="index.html" class="logo">
+                    <i class="fa-solid fa-hammer"></i> Artiz<span>Pro</span> <small>.tn</small>
+                </a>
+                <span class="drapeau-tn" title="Tunisie">🇹🇳</span>
+            </div>
+
+            <button class="mobile-menu-btn" id="menuBtn" aria-label="Menu">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+            
+<nav class="nav-menu" id="navMenu">
+    <a href="index.html" class="nav-link active">Accueil</a>
+    <a href="metiers.html" class="nav-link" onclick="sessionStorage.removeItem('dernier_metier_actif');">Tous les métiers</a>                
+    <a href="tarifs.html" class="nav-link">Tarifs</a>
+    <a href="prestataire.html" class="btn-primary-outline">Devenir Prestataire</a>
+    <a href="connexion.html" class="nav-link" style="color: var(--primary); font-weight: 600;"><i class="fa-solid fa-right-to-bracket"></i> Connexion</a>
+</nav>
+        </div>
+    </header>
+
+    <!-- Section Formulaire de Connexion -->
+    <section class="container" style="margin-top: 50px; margin-bottom: 50px;">
+        <div class="form-container" style="max-width: 500px; margin: 0 auto;">
+            <div class="section-title" style="margin-bottom: 25px;">
+                <h2>Espace Prestataire</h2>
+                <p>Connectez-vous pour gérer votre profil et votre activité sur ArtizPro.tn</p>
+            </div>
+            
+            <!-- Encadré de notification dynamique -->
+            <div id="formAlert" style="display: none; padding: 15px 20px; border-radius: 8px; margin-bottom: 25px; font-weight: 500; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05);"></div>
+
+            <form class="prestataire-form" id="connexionForm">
+                
+                <!-- Champ Numéro de Téléphone -->
+                <div class="form-group">
+                    <label><i class="fa-solid fa-phone"></i> Numéro de téléphone</label>
+                    <input type="tel" id="telephoneConnexion" placeholder="20 123 456" required>
+                </div>
+
+                <!-- Champ Mot de passe avec bouton afficher/masquer -->
+                <div class="form-group">
+                    <label><i class="fa-solid fa-lock"></i> Mot de passe</label>
+                    <div style="position: relative;">
+                        <input type="password" id="passwordConnexion" placeholder="Votre mot de passe" required style="width: 100%; padding-right: 40px;">
+                        <button type="button" id="togglePasswordBtn" onclick="togglePasswordVisibility()" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #64748b; font-size: 1rem;">
+                            <i class="fa-solid fa-eye" id="togglePasswordIcon"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit-pro" id="submitConnexionBtn">
+                    <i class="fa-solid fa-right-to-bracket"></i> Se connecter
+                </button>
+
+                <p style="text-align: center; margin-top: 20px; font-size: 0.9rem; color: #64748b;">
+                    Vous n'avez pas encore de compte ? <a href="prestataire.html" style="color: var(--primary); font-weight: bold; text-decoration: none;">Inscrivez-vous ici</a>
+                </p>
+            </form>
+        </div>
+    </section>
+
+    <!-- Pied de page -->
+    <footer>
+        <div class="container footer-content" style="display: flex; flex-direction: column; align-items: center; gap: 20px; text-align: center; padding: 30px 20px;">
+            
+            <!-- Barrière de contact rapide -->
+            <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; margin-bottom: 5px;">
+                <a href="https://wa.me/+21625215570" target="_blank" style="background: #25D366; color: white; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 0.95rem; display: inline-flex; align-items: center; gap: 8px;">
+                    <i class="fa-brands fa-whatsapp fa-lg"></i> WhatsApp Direct
+                </a>
+                <a href="mailto:contact@artizpro.tn" style="background: var(--primary, #2563eb); color: white; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 0.95rem; display: inline-flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-envelope"></i> Nous Écrire
+                </a>
+            </div>
+
+            <!-- Texte de copyright -->
+            <p style="margin: 0;">&copy; 2026 <strong>ArtizPro.tn</strong> - Tous droits réservés. Conçu pour connecter les talents en Tunisie 🇹🇳.</p>
+            
+        </div>
+    </footer>
+
+    <!-- Intégration du SDK Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Script de connexion -->
+    <script src="connexion.js" defer></script>
+
+    <!-- Script unique de gestion du menu mobile -->
+    <script>
+document.addEventListener('DOMContentLoaded', () => {
+    const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+    const navMenu = document.querySelector('.nav-menu');
+
+    if (mobileMenuBtn && navMenu) {
+        mobileMenuBtn.addEventListener('click', () => {
+            navMenu.classList.toggle('active');
+            
+            const icon = mobileMenuBtn.querySelector('i');
+            if (icon) {
+                icon.classList.toggle('fa-bars');
+                icon.classList.toggle('fa-times');
+            }
+        });
+
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                navMenu.classList.remove('active');
+                const icon = mobileMenuBtn.querySelector('i');
+                if (icon) {
+                    icon.classList.add('fa-bars');
+                    icon.classList.remove('fa-times');
+                }
+            });
+        });
+    }
+});
+    </script>
+</body>
+</html>
